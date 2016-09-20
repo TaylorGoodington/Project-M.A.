@@ -29,7 +29,7 @@ public class GameEngine : MonoBehaviour
 
         //TODO Adjust when the total number of categories is set.
         #region Current Stage and Max Rounds
-        int category = int.Parse(currentGame.Substring(1, 1));
+        int category = int.Parse(currentGame.Substring(currentGame.Length - 1, 1));
         if (category == 1)
         {
             currentStage = GameControl.game1Progress;

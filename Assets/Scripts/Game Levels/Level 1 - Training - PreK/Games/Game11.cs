@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
 
+//TODO test and refactor most of this into a base class.
 public class Game11 : MonoBehaviour
 {
     #region Generic Game Properties
@@ -109,25 +110,94 @@ public class Game11 : MonoBehaviour
     public void StartRound (int currentRound)
     {
         #region Specific to this game.
-        int slot = Random.Range(0, 3);
-        string resoucePath = "Game Icons/Numbers/Level" + GameControl.studentLevelProgress + "/Category" + int.Parse(GameEngine.currentGame.Substring(1, 1)) + "";
+        int correctSlot = Random.Range(0, 3);
+        int wrongSlot1;
+        int wrongSlot2;
+        List<int> possibleNumbers = new List<int> { 0, 1, 2, 3, 4, 5 };
+        string resoucePath = "Game Icons/Numbers/Level" + GameControl.studentLevelProgress + 
+                             "/Category" + int.Parse(GameEngine.currentGame.Substring(GameEngine.currentGame.Length - 1, 1)) + "/";
 
         #region Correct Button
-        //the correct number will be stage - 1
-        Button correctNumber = numberSlots[slot].GetComponent<Button>();
-        correctNumber.image.sprite = Resources.Load<Sprite>(resoucePath + "");
+        int number = GameEngine.currentStage - 1;
+        Button correctNumber = numberSlots[correctSlot].GetComponent<Button>();
+        correctNumber.image.sprite = Resources.Load<Sprite>(resoucePath + "default" + number);
         SpriteState sprites = new SpriteState();
-        sprites.highlightedSprite = Resources.Load<Sprite>(resoucePath + "");
-        sprites.pressedSprite = Resources.Load<Sprite>(resoucePath + "");
-        sprites.disabledSprite = Resources.Load<Sprite>(resoucePath + "");
+        sprites.highlightedSprite = Resources.Load<Sprite>(resoucePath + "highlighted" + number);
+        sprites.pressedSprite = Resources.Load<Sprite>(resoucePath + "pressed" + number);
+        sprites.disabledSprite = Resources.Load<Sprite>(resoucePath + "disabled" + number);
         correctNumber.spriteState = sprites;
-        //Add Listener for correct button push.
+        correctNumber.onClick.AddListener(() => Correct());
         #endregion
 
-        //Narrate which number should be selected according to the correct number.
-        //coroutine delay should be length of audioclip.
-        StartCoroutine("ToggleUserBlockPanel", 0.4);
+        #region Incorrect Buttons
+        if (correctSlot == 0)
+        {
+            wrongSlot1 = 1;
+            wrongSlot2 = 2;
+        }
+        else if (correctSlot == 1)
+        {
+            wrongSlot1 = 0;
+            wrongSlot2 = 2;
+        }
+        else
+        {
+            wrongSlot1 = 0;
+            wrongSlot2 = 1;
+        }
+
+        possibleNumbers = ReDefineAndShufflePossibleNumbers(possibleNumbers, number);
+        int wrongNumber = possibleNumbers[0];
+        Button incorrectNumber1 = numberSlots[wrongSlot1].GetComponent<Button>();
+        incorrectNumber1.image.sprite = Resources.Load<Sprite>(resoucePath + "default" + wrongNumber);
+        sprites = new SpriteState();
+        sprites.highlightedSprite = Resources.Load<Sprite>(resoucePath + "highlighted" + wrongNumber);
+        sprites.pressedSprite = Resources.Load<Sprite>(resoucePath + "pressed" + wrongNumber);
+        sprites.disabledSprite = Resources.Load<Sprite>(resoucePath + "disabled" + wrongNumber);
+        incorrectNumber1.spriteState = sprites;
+        incorrectNumber1.onClick.AddListener(() => InCorrect());
+
+        possibleNumbers = ReDefineAndShufflePossibleNumbers(possibleNumbers, wrongNumber);
+        wrongNumber = possibleNumbers[0];
+        Button incorrectNumber2 = numberSlots[wrongSlot2].GetComponent<Button>();
+        incorrectNumber2.image.sprite = Resources.Load<Sprite>(resoucePath + "default" + wrongNumber);
+        sprites = new SpriteState();
+        sprites.highlightedSprite = Resources.Load<Sprite>(resoucePath + "highlighted" + wrongNumber);
+        sprites.pressedSprite = Resources.Load<Sprite>(resoucePath + "pressed" + wrongNumber);
+        sprites.disabledSprite = Resources.Load<Sprite>(resoucePath + "disabled" + wrongNumber);
+        incorrectNumber2.spriteState = sprites;
+        incorrectNumber2.onClick.AddListener(() => InCorrect());
         #endregion
+
+        PlayAudio(number);
+        StartCoroutine("ToggleUserBlockPanel", audioClips[number].length);
+        #endregion
+    }
+
+    //Called by StartRound() to fix the possibleNumbers going forward.
+    private static List<int> ReDefineAndShufflePossibleNumbers(List<int> possibleNumbers, int number)
+    {
+        List<int> temp = new List<int>();
+        foreach (int i in possibleNumbers)
+        {
+            if (i != number)
+            {
+                temp.Add(i);
+            }
+        }
+
+        possibleNumbers.Clear();
+        possibleNumbers = temp;
+
+        for (int i = 0; i < possibleNumbers.Count; i++)
+        {
+            int tempp = possibleNumbers[i];
+            int randomIndex = Random.Range(i, possibleNumbers.Count);
+            possibleNumbers[i] = possibleNumbers[randomIndex];
+            possibleNumbers[randomIndex] = tempp;
+        }
+
+        return possibleNumbers;
     }
 
     //Added as a listener to the button during start round.
@@ -144,11 +214,15 @@ public class Game11 : MonoBehaviour
         success = false;
     }
 
+    //Used to prevent the user from doing anything while an animation is playing.
     private IEnumerator ToggleUserBlockPanel (float delay)
     {
         yield return new WaitForSeconds(delay);
+        bool toggle = blockUserControlPanel.activeSelf;
+        blockUserControlPanel.SetActive(!toggle);
     }
 
+    //Called by the options controller if there is a change in the sound effects volume.
     public void UpdateSoundEffectsVolume ()
     {
         audioSource.volume = PlayerPrefsManager.GetMasterEffectsVolume();
