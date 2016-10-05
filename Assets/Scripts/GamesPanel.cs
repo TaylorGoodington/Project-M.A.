@@ -13,15 +13,15 @@ public class GamesPanel : MonoBehaviour
 	void Start ()
     {
         //assign the correct games icons and update level progress.
-        game1.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.studentLevelProgress + "1");
-        game1.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.studentLevelProgress * 10 + 1];
-        game1.transform.GetChild(1).GetComponent<Text>().text = GameControl.game1Progress.ToString();
-        game2.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.studentLevelProgress + "2");
-        game2.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.studentLevelProgress * 10 + 2];
-        game2.transform.GetChild(1).GetComponent<Text>().text = GameControl.game2Progress.ToString();
-        game3.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.studentLevelProgress + "3");
-        game3.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.studentLevelProgress * 10 + 3];
-        game3.transform.GetChild(1).GetComponent<Text>().text = GameControl.game3Progress.ToString();
+        game1.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.StudentLevelProgress + "1");
+        game1.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.StudentLevelProgress * 10 + 1];
+        game1.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game1Progress.ToString();
+        game2.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.StudentLevelProgress + "2");
+        game2.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.StudentLevelProgress * 10 + 2];
+        game2.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game2Progress.ToString();
+        game3.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.StudentLevelProgress + "3");
+        game3.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.StudentLevelProgress * 10 + 3];
+        game3.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game3Progress.ToString();
 
         //TODO Still need to add the listeners to the buttons so they can load the proper level.
     }

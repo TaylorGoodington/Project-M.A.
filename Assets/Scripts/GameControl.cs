@@ -5,28 +5,27 @@ using UnityEngine.SceneManagement;
 
 public class GameControl : MonoBehaviour
 {
-    static GameControl thisObject;
+    private static GameControl _thisObject;
 
-    public static int currentTeacherID;
-    public static int currentStudentID;
-    public static int studentLevelProgress;
-    public static int game1Progress;
-    public static int game2Progress;
-    public static int game3Progress;
-
-    public static string teacherLoginName;
-    public static string teacherPassword;
-    public static string studentLoginName;
-    public static string studentPassword;
+    public static int CurrentTeacherId { get; set; }
+    public static int CurrentStudentId { get; set; }
+    public static int StudentLevelProgress { get; set; }
+    public static int Game1Progress { get; set; }
+    public static int Game2Progress { get; set; }
+    public static int Game3Progress { get; set; }
+    public static string TeacherLoginName { get; set; }
+    public static string TeacherPassword { get; set; }
+    public static string StudentLoginName { get; set; }
+    public static string StudentPassword { get; set; }
 
     void Awake()
     {
-        if (thisObject != null)
+        if (_thisObject != null)
         {
             DestroyImmediate(gameObject);
             return;
         }
-        thisObject = this;
+        _thisObject = this;
         DontDestroyOnLoad(transform.root.gameObject);
     }
 
@@ -43,11 +42,11 @@ public class GameControl : MonoBehaviour
 
         if (PlayerPrefsManager.GetTeacherID() > 0)
         {
-            currentTeacherID = PlayerPrefsManager.GetTeacherID();
+            CurrentTeacherId = PlayerPrefsManager.GetTeacherID();
         }
         else
         {
-            currentTeacherID = 0;
+            CurrentTeacherId = 0;
         }
     }
 

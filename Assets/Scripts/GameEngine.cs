@@ -4,47 +4,45 @@ using System.Collections.Generic;
 
 public class GameEngine : MonoBehaviour
 {
-    public static List<string> gamesPlayedThisSession;
-    public static int currentRound;
-    public static int maxRounds;
-    public static int roundsFailed;
-    public static bool canStageBeCleared;
-    public static string currentGame;
-    public static int currentStage;
-    private static GameObject game;
+    public static List<string> GamesPlayedThisSession { get; set; }
+    public static int CurrentRound { get; set; }
+    public static int MaxRounds { get; set; }
+    public static int RoundsFailed { get; set; }
+    public static int NumberOfAcceptableRoundsToFail { get; set; }
+    public static string CurrentGame { get; set; }
+    public static int CurrentStage { get; set; }
+    public static GameObject Game { get; private set; }
 
-	void Start ()
+    void Start ()
     {
-        gamesPlayedThisSession = new List<string>();
-        canStageBeCleared = true;
+        GamesPlayedThisSession = new List<string>();
 	}
 
     public static void SetUpGame ()
     {
-        game = GameObject.FindGameObjectWithTag("game");
-        canStageBeCleared = true;
-        currentRound = 0;
-        roundsFailed = 0;
-        currentGame = SceneManager.GetActiveScene().name;
+        Game = GameObject.FindGameObjectWithTag("game");
+        CurrentRound = 0;
+        RoundsFailed = 0;
+        CurrentGame = SceneManager.GetActiveScene().name;
 
         //TODO Adjust when the total number of categories is set.
         #region Current Stage and Max Rounds
-        int category = int.Parse(currentGame.Substring(currentGame.Length - 1, 1));
+        var category = int.Parse(CurrentGame.Substring(CurrentGame.Length - 1, 1));
         if (category == 1)
         {
-            currentStage = GameControl.game1Progress;
-            maxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[currentGame]].stage1Rounds;
+            CurrentStage = GameControl.Game1Progress;
+            SetRoundInformation();
         }
         else if (category == 2)
         {
-            currentStage = GameControl.game2Progress;
-            maxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[currentGame]].stage2Rounds;
+            CurrentStage = GameControl.Game2Progress;
+            SetRoundInformation();
         }
         #endregion
 
-        if (!gamesPlayedThisSession.Contains(currentGame))
+        if (!GamesPlayedThisSession.Contains(CurrentGame))
         {
-            gamesPlayedThisSession.Add(currentGame);
+            GamesPlayedThisSession.Add(CurrentGame);
             CallTutorial();
         }
         else
@@ -53,39 +51,79 @@ public class GameEngine : MonoBehaviour
         }
     }
 
+    private static void SetRoundInformation()
+    {
+        if (CurrentStage == 1)
+        {
+            MaxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage1Rounds;
+            NumberOfAcceptableRoundsToFail = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage1NumberOfAcceptableRoundsToFail;
+        }
+        else if (CurrentStage == 2)
+        {
+            MaxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage2Rounds;
+            NumberOfAcceptableRoundsToFail = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage2NumberOfAcceptableRoundsToFail;
+        }
+        else if (CurrentStage == 3)
+        {
+            MaxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage3Rounds;
+            NumberOfAcceptableRoundsToFail = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage3NumberOfAcceptableRoundsToFail;
+        }
+        else if (CurrentStage == 4)
+        {
+            MaxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage4Rounds;
+            NumberOfAcceptableRoundsToFail = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage4NumberOfAcceptableRoundsToFail;
+        }
+        else if (CurrentStage == 5)
+        {
+            MaxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage5Rounds;
+            NumberOfAcceptableRoundsToFail = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage5NumberOfAcceptableRoundsToFail;
+        }
+        else if (CurrentStage == 6)
+        {
+            MaxRounds = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage6Rounds;
+            NumberOfAcceptableRoundsToFail = GamesDatabase.games[GamesDatabase.gamesIndex[CurrentGame]].stage6NumberOfAcceptableRoundsToFail;
+        }
+    }
+
     public static void CallTutorial ()
     {
-        game.SendMessage("PlayTutorial");
+        Game.SendMessage("PlayTutorial");
     }
 
     public static void AdvanceToNextRound ()
     {
-        currentRound += 1;
-        game.SendMessage("StartRound", currentRound);
+        CurrentRound += 1;
+        Game.SendMessage("StartRound", CurrentRound);
     }
 
     public static void WasQuestionAnsweredCorrectly (bool response)
     {
-        if (response)
+        if (response || (!response && RoundsFailed <= NumberOfAcceptableRoundsToFail))
         {
-            //tell game to notify player and update the progress bar.
+            Game.SendMessage("NotifyPlayer");
         }
         else
         {
-            //see if demo is needed otherwise tell game to notify player.
+            Game.SendMessage("PlayDemo");
         }
     }
 
     public static void EndOfRound ()
     {
-        if (currentRound != maxRounds)
+        if (CurrentRound != MaxRounds)
         {
             AdvanceToNextRound();
         }
         else
         {
-            //check if the player won and then pass the response to the game.
-            game.SendMessage("GameOver", 1);
+            if (RoundsFailed <= NumberOfAcceptableRoundsToFail)
+            {
+                Game.SendMessage("GameOver", true);
+            }
+            else
+            {
+                Game.SendMessage("GameOver", false);
+            }
         }
     }
 }

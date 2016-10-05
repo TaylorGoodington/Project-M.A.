@@ -31,10 +31,10 @@ public class TeacherLogin : MonoBehaviour
                 {
                     loginMessage.text = "Success!";
                     int teacherID = int.Parse(EasyAPIs.Instance.apiMessage);
-                    GameControl.currentTeacherID = teacherID;
+                    GameControl.CurrentTeacherId = teacherID;
                     PlayerPrefsManager.SetTeacherID(teacherID);
-                    GameControl.teacherLoginName = loginName.text.ToLower();
-                    GameControl.teacherPassword = loginPassword.text;
+                    GameControl.TeacherLoginName = loginName.text.ToLower();
+                    GameControl.TeacherPassword = loginPassword.text;
                     StartCoroutine("Login");
                 }
             }

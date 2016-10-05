@@ -19,13 +19,13 @@ public class StudentLogin : MonoBehaviour
 
     void Start ()
     {
-        if (GameControl.currentTeacherID == 0)
+        if (GameControl.CurrentTeacherId == 0)
         {
             enterTeacherEmailWindow.SetActive(true);
         }
         else
         {
-            classroomNumber.text = GameControl.currentTeacherID.ToString();
+            classroomNumber.text = GameControl.CurrentTeacherId.ToString();
         }
     }
 
@@ -33,7 +33,7 @@ public class StudentLogin : MonoBehaviour
     {
         string name = string.Format("\"{0}\"", loginName.text);
         string password = string.Format("\"{0}\"", loginPassword.text);
-        string teacherID = string.Format("\"{0}\"", GameControl.currentTeacherID);
+        string teacherID = string.Format("\"{0}\"", GameControl.CurrentTeacherId);
         string jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherID + "}";
 
         EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("CheckStudentLogin", HttpMethod.Post, jsonData, response =>
@@ -52,14 +52,14 @@ public class StudentLogin : MonoBehaviour
                 {
                     loginMessage.text = "Success!";
                     int studentID = int.Parse(messageList[0]);
-                    GameControl.currentStudentID = studentID;
-                    GameControl.studentLevelProgress = int.Parse(messageList[1]);
-                    GameControl.game1Progress = int.Parse(messageList[2]);
-                    GameControl.game2Progress = int.Parse(messageList[3]);
-                    GameControl.game3Progress = int.Parse(messageList[4]);
+                    GameControl.CurrentStudentId = studentID;
+                    GameControl.StudentLevelProgress = int.Parse(messageList[1]);
+                    GameControl.Game1Progress = int.Parse(messageList[2]);
+                    GameControl.Game2Progress = int.Parse(messageList[3]);
+                    GameControl.Game3Progress = int.Parse(messageList[4]);
                     Debug.Log(studentID);
-                    GameControl.studentLoginName = loginName.text;
-                    GameControl.studentPassword = loginPassword.text;
+                    GameControl.StudentLoginName = loginName.text;
+                    GameControl.StudentPassword = loginPassword.text;
                     StartCoroutine("Login");
                 }
             }
@@ -88,7 +88,7 @@ public class StudentLogin : MonoBehaviour
                 {
                     int teacherID = int.Parse(EasyAPIs.Instance.apiMessage);
                     classroomNumber.text = teacherID.ToString();
-                    GameControl.currentTeacherID = teacherID;
+                    GameControl.CurrentTeacherId = teacherID;
                     PlayerPrefsManager.SetTeacherID(teacherID);
                     loginMessage.text = "";
                     enterTeacherEmailWindow.SetActive(false);
@@ -105,6 +105,6 @@ public class StudentLogin : MonoBehaviour
     public IEnumerator Login()
     {
         yield return new WaitForSeconds(1);
-        SceneManager.LoadScene("Level" + GameControl.studentLevelProgress);
+        SceneManager.LoadScene("Level" + GameControl.StudentLevelProgress);
     }
 }
