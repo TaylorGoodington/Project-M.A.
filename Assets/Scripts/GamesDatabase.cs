@@ -8,6 +8,9 @@ public class GamesDatabase : MonoBehaviour
     public static Dictionary<string, int> gamesIndex;
 	void Start ()
     {
+        games = new List<Games>();
+        gamesIndex = new Dictionary<string, int>();
+
         games.Add(new Games(11, 0, "", 8, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 1));
         gamesIndex.Add("11", 0);
 	}

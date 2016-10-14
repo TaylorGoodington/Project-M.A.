@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(AudioSource))]
@@ -8,14 +9,17 @@ public class GameBase : MonoBehaviour
 {
     public Animator GameAnimator;
     public GameObject BlockUserControlPanel;
-    public AudioSource Source;
+    public AudioSource AudioSource;
     public List<AudioClip> AudioClips;
-    private bool Success;
+    public GameObject MoviePlayer;
+    public Material Tutorial;
+    public Material Demo;
+    private bool _success;
 
     public virtual void Start()
     {
-        TranisitionIn();
-        Source.volume = PlayerPrefsManager.GetMasterEffectsVolume();
+        AudioSource.volume = PlayerPrefsManager.GetMasterEffectsVolume();
+        BlockUserControlPanel.SetActive(true);
     }
 
     #region Animation Functions
@@ -40,20 +44,42 @@ public class GameBase : MonoBehaviour
     //Called by the GameEngine if the game has not been played this session.
     public void PlayTutorial()
     {
-        GameAnimator.Play("tutorial");
+        MoviePlayer.SetActive(true);
+        MoviePlayer.GetComponent<Image>().material = Tutorial;
+        var tutorialClip = (MovieTexture)MoviePlayer.GetComponent<Image>().mainTexture;
+        AudioSource.clip = AudioClips[0];
+        tutorialClip.Play();
+        AudioSource.Play();
+        Invoke("TellGameEngineTutorialIsOver", tutorialClip.duration);
+    }
+
+    public void TellGameEngineTutorialIsOver()
+    {
+        MoviePlayer.SetActive(false);
+        GameEngine.EndOfTutorial();
     }
 
     //Called by the GameEngine if the player gets a question wrong which will make them unable to clear the stage.
     public void PlayDemo()
     {
-        //includes the failure animation.
-        GameAnimator.Play("demo");
+        MoviePlayer.SetActive(true);
+        MoviePlayer.GetComponent<Image>().material = Demo;
+        var demoClip = (MovieTexture)MoviePlayer.GetComponent<Image>().mainTexture;
+        AudioSource.clip = AudioClips[1];
+        demoClip.Play();
+        AudioSource.Play();
+        Invoke("TellGameEngineDemoIsOver", demoClip.duration);
     }
 
-    //Called by the GameEngine after it is notified of the results from the round.
+    public void TellGameEngineDemoIsOver()
+    {
+        MoviePlayer.SetActive(false);
+        GameEngine.DemoIsOver();
+    }
+
     public void NotifyPlayer()
     {
-        if (Success)
+        if (_success)
         {
             //Also updates the progress bar.
             GameAnimator.Play("success");
@@ -64,10 +90,10 @@ public class GameBase : MonoBehaviour
         }
     }
 
-    //Called at the end of the demo and the end of updating the progress bar and the end of the demo and after a failure notification.
-    public void EndOfRound()
+    //Called at the end of both the success and failure notification animations.
+    public void TellGameEnginePlayerHasBeenNotified()
     {
-        GameEngine.EndOfRound();
+        GameEngine.WasQuestionAnsweredCorrectly(_success);
     }
 
     //Called by the GameEngine if the final round has been completed.
@@ -86,36 +112,36 @@ public class GameBase : MonoBehaviour
     //Called by the animator when needed.
     public void PlayAudio(int clip)
     {
-        Source.clip = AudioClips[clip];
-        Source.Play();
+        AudioSource.clip = AudioClips[clip];
+        AudioSource.Play();
     }
     #endregion
     
     //Added as a listener to the button during start round.
     public void Correct()
     {
-        GameEngine.WasQuestionAnsweredCorrectly(true);
-        Success = true;
+        _success = true;
+        NotifyPlayer();
     }
 
     //Added as a listener to the button during start round.
     public void InCorrect()
     {
-        GameEngine.WasQuestionAnsweredCorrectly(false);
-        Success = false;
+        _success = false;
+        NotifyPlayer();
     }
 
     //Used to prevent the user from doing anything while an animation is playing.
     private IEnumerator ToggleUserBlockPanel(float delay)
     {
         yield return new WaitForSeconds(delay);
-        bool toggle = BlockUserControlPanel.activeSelf;
+        var toggle = BlockUserControlPanel.activeSelf;
         BlockUserControlPanel.SetActive(!toggle);
     }
 
     //Called by the options controller if there is a change in the sound effects volume.
     public void UpdateSoundEffectsVolume()
     {
-        Source.volume = PlayerPrefsManager.GetMasterEffectsVolume();
+        AudioSource.volume = PlayerPrefsManager.GetMasterEffectsVolume();
     }
 }

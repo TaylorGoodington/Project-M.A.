@@ -1,33 +1,46 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class GamesPanel : MonoBehaviour
 {
-    public Button game1;
-    public Button game2;
-    public Button game3;
+    public Button game1Button;
+    public Button game2Button;
+    public Button game3Button;
 
     public List<string> gamesNames;
 
 	void Start ()
     {
-        //assign the correct games icons and update level progress.
-        game1.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.StudentLevelProgress + "1");
-        game1.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.StudentLevelProgress * 10 + 1];
-        game1.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game1Progress.ToString();
-        game2.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.StudentLevelProgress + "2");
-        game2.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.StudentLevelProgress * 10 + 2];
-        game2.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game2Progress.ToString();
-        game3.image.sprite = Resources.Load<Sprite>("Game Icons/" + GameControl.StudentLevelProgress + "3");
-        game3.transform.GetChild(0).GetComponent<Text>().text = gamesNames[GameControl.StudentLevelProgress * 10 + 3];
-        game3.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game3Progress.ToString();
-
-        //TODO Still need to add the listeners to the buttons so they can load the proper level.
+        RefreshGamesPanel();
     }
-	
-	void Update ()
+
+    public void RefreshGamesPanel()
     {
-	
-	}
+        var gameLevel = GameControl.StudentLevelProgress;
+
+        var game1Id = gameLevel * 10 + 1;
+        game1Button.image.sprite = Resources.Load<Sprite>("Game Icons/" + game1Id);
+        game1Button.transform.GetChild(0).GetComponent<Text>().text = gamesNames[game1Id];
+        game1Button.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game1Progress.ToString();
+        game1Button.onClick.AddListener(() => LoadLevel(game1Id.ToString()));
+
+        var game2Id = game1Id + 1;
+        game2Button.image.sprite = Resources.Load<Sprite>("Game Icons/" + game2Id);
+        game2Button.transform.GetChild(0).GetComponent<Text>().text = gamesNames[game2Id];
+        game2Button.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game2Progress.ToString();
+        game2Button.onClick.AddListener(() => LoadLevel(game2Id.ToString()));
+
+        var game3Id = game2Id + 1;
+        game3Button.image.sprite = Resources.Load<Sprite>("Game Icons/" + game3Id);
+        game3Button.transform.GetChild(0).GetComponent<Text>().text = gamesNames[game3Id];
+        game3Button.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game3Progress.ToString();
+        game3Button.onClick.AddListener(() => LoadLevel(game3Id.ToString()));
+    }
+
+    public void LoadLevel(string level)
+    {
+        SceneManager.LoadScene(level);
+    }
 }

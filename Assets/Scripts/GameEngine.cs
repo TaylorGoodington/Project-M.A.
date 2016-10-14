@@ -18,6 +18,11 @@ public class GameEngine : MonoBehaviour
         GamesPlayedThisSession = new List<string>();
 	}
 
+    public static void LogOut()
+    {
+        GamesPlayedThisSession = new List<string>();
+    }
+
     public static void SetUpGame ()
     {
         Game = GameObject.FindGameObjectWithTag("game");
@@ -90,6 +95,11 @@ public class GameEngine : MonoBehaviour
         Game.SendMessage("PlayTutorial");
     }
 
+    public static void EndOfTutorial()
+    {
+        AdvanceToNextRound();
+    }
+
     public static void AdvanceToNextRound ()
     {
         CurrentRound += 1;
@@ -98,14 +108,19 @@ public class GameEngine : MonoBehaviour
 
     public static void WasQuestionAnsweredCorrectly (bool response)
     {
-        if (response || (!response && RoundsFailed <= NumberOfAcceptableRoundsToFail))
-        {
-            Game.SendMessage("NotifyPlayer");
-        }
-        else
+        if (response == false && RoundsFailed >= NumberOfAcceptableRoundsToFail)
         {
             Game.SendMessage("PlayDemo");
         }
+        else
+        {
+            EndOfRound();
+        }
+    }
+
+    public static void DemoIsOver ()
+    {
+        EndOfRound();
     }
 
     public static void EndOfRound ()

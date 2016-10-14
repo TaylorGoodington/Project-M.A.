@@ -5,7 +5,6 @@ using System.Collections;
 using AzureServicesForUnity;
 using AzureServicesForUnity.Helpers;
 using System.Collections.Generic;
-using System.Linq;
 
 public class StudentLogin : MonoBehaviour
 {
@@ -31,10 +30,10 @@ public class StudentLogin : MonoBehaviour
 
     public void CheckStudentLogin()
     {
-        string name = string.Format("\"{0}\"", loginName.text);
-        string password = string.Format("\"{0}\"", loginPassword.text);
-        string teacherID = string.Format("\"{0}\"", GameControl.CurrentTeacherId);
-        string jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherID + "}";
+        var name = string.Format("\"{0}\"", loginName.text);
+        var password = string.Format("\"{0}\"", loginPassword.text);
+        var teacherId = string.Format("\"{0}\"", GameControl.CurrentTeacherId);
+        var jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherId + "}";
 
         EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("CheckStudentLogin", HttpMethod.Post, jsonData, response =>
         {
@@ -47,17 +46,16 @@ public class StudentLogin : MonoBehaviour
                 messageList.AddRange(message);
 
                 int idNumber;
-                bool result = int.TryParse(messageList[0], out idNumber);
+                var result = int.TryParse(messageList[0], out idNumber);
                 if (result)
                 {
                     loginMessage.text = "Success!";
-                    int studentID = int.Parse(messageList[0]);
-                    GameControl.CurrentStudentId = studentID;
+                    var studentId = int.Parse(messageList[0]);
+                    GameControl.CurrentStudentId = studentId;
                     GameControl.StudentLevelProgress = int.Parse(messageList[1]);
                     GameControl.Game1Progress = int.Parse(messageList[2]);
                     GameControl.Game2Progress = int.Parse(messageList[3]);
                     GameControl.Game3Progress = int.Parse(messageList[4]);
-                    Debug.Log(studentID);
                     GameControl.StudentLoginName = loginName.text;
                     GameControl.StudentPassword = loginPassword.text;
                     StartCoroutine("Login");
@@ -73,8 +71,8 @@ public class StudentLogin : MonoBehaviour
 
     public void EnterTeacherEmail()
     {
-        string name = string.Format("\"{0}\"", teacherEmail.text).ToLower();
-        string jsonData = "{\"teacherEmail\":" + name + "}";
+        var name = string.Format("\"{0}\"", teacherEmail.text).ToLower();
+        var jsonData = "{\"teacherEmail\":" + name + "}";
 
         EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("CheckTeacherEmail", HttpMethod.Post, jsonData, response =>
         {
@@ -83,13 +81,13 @@ public class StudentLogin : MonoBehaviour
                 loginMessage.text = EasyAPIs.Instance.apiMessage;
 
                 int idNumber;
-                bool result = int.TryParse(EasyAPIs.Instance.apiMessage, out idNumber);
+                var result = int.TryParse(EasyAPIs.Instance.apiMessage, out idNumber);
                 if (result)
                 {
-                    int teacherID = int.Parse(EasyAPIs.Instance.apiMessage);
-                    classroomNumber.text = teacherID.ToString();
-                    GameControl.CurrentTeacherId = teacherID;
-                    PlayerPrefsManager.SetTeacherID(teacherID);
+                    var teacherId = int.Parse(EasyAPIs.Instance.apiMessage);
+                    classroomNumber.text = teacherId.ToString();
+                    GameControl.CurrentTeacherId = teacherId;
+                    PlayerPrefsManager.SetTeacherID(teacherId);
                     loginMessage.text = "";
                     enterTeacherEmailWindow.SetActive(false);
                 }

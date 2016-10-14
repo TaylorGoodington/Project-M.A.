@@ -54,4 +54,10 @@ public class GameControl : MonoBehaviour
     {
         SceneManager.LoadScene(level);
     }
+
+    //TODO Finish Logout Method.
+    public void LogOut()
+    {
+        GameEngine.LogOut();
+    }
 }
