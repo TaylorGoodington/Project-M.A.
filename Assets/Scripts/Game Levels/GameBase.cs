@@ -79,6 +79,7 @@ public class GameBase : MonoBehaviour
 
     public void NotifyPlayer()
     {
+        BlockUserControlPanel.SetActive(true);
         if (_success)
         {
             //Also updates the progress bar.

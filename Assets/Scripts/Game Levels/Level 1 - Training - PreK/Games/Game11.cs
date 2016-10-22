@@ -23,6 +23,7 @@ public class Game11 : GameBase
     public void StartRound (int currentRound)
     {
         var correctSlot = Random.Range(0, 3);
+        Debug.Log(correctSlot);
         int wrongSlot1;
         int wrongSlot2;
 
@@ -90,6 +91,8 @@ public class Game11 : GameBase
         incorrectNumber2.onClick.AddListener(InCorrect);
         #endregion
 
+        CallSwitchNumbersBackOn();
+
         //number 2 comes from the tutorial and demo audio clips.
         var audioClip = number + 2;
         PlayAudio(audioClip);
@@ -113,5 +116,10 @@ public class Game11 : GameBase
         }
 
         return possibleNumbers;
+    }
+
+    private void CallSwitchNumbersBackOn ()
+    {
+        GameAnimator.Play("activateNumbers");
     }
 }
