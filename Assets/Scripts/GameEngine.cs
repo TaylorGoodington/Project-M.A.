@@ -8,9 +8,11 @@ public class GameEngine : MonoBehaviour
     public static int CurrentRound { get; set; }
     public static int MaxRounds { get; set; }
     public static int RoundsFailed { get; set; }
+    public static int RoundsSucceeded { get; set; }
     public static int NumberOfAcceptableRoundsToFail { get; set; }
     public static string CurrentGame { get; set; }
     public static int CurrentStage { get; set; }
+    public static bool DidPlayerPassCurrentRound { get; set; }
     public static GameObject Game { get; private set; }
 
     void Start ()
@@ -106,9 +108,9 @@ public class GameEngine : MonoBehaviour
         Game.SendMessage("StartRound", CurrentRound);
     }
 
-    public static void WasQuestionAnsweredCorrectly (bool response)
+    public static void PlayerHasBeenNotified ()
     {
-        if (response == false && RoundsFailed >= NumberOfAcceptableRoundsToFail)
+        if (DidPlayerPassCurrentRound == false && RoundsFailed > NumberOfAcceptableRoundsToFail)
         {
             Game.SendMessage("PlayDemo");
         }
@@ -118,6 +120,22 @@ public class GameEngine : MonoBehaviour
         }
     }
 
+    public static void PlayerHasSelectedAnAnswer(bool answer)
+    {
+        if (answer)
+        {
+            RoundsSucceeded++;
+        }
+        else
+        {
+            RoundsFailed++;
+        }
+
+        DidPlayerPassCurrentRound = answer;
+
+        Game.SendMessage("NotifyPlayer", answer);
+    }
+
     public static void DemoIsOver ()
     {
         EndOfRound();
@@ -125,13 +143,14 @@ public class GameEngine : MonoBehaviour
 
     public static void EndOfRound ()
     {
+        Debug.Log("Current Round: " + CurrentRound + "  Max Rounds: " + MaxRounds);
         if (CurrentRound != MaxRounds)
         {
             AdvanceToNextRound();
         }
         else
         {
-            if (RoundsFailed <= NumberOfAcceptableRoundsToFail)
+            if ((RoundsFailed <= NumberOfAcceptableRoundsToFail) || (RoundsSucceeded == MaxRounds - NumberOfAcceptableRoundsToFail))
             {
                 Game.SendMessage("GameOver", true);
             }

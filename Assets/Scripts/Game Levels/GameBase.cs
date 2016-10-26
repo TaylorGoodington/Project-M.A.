@@ -14,12 +14,20 @@ public class GameBase : MonoBehaviour
     public GameObject MoviePlayer;
     public Material Tutorial;
     public Material Demo;
-    private bool _success;
+    public ProgressBar ProgressBar;
 
     public virtual void Start()
     {
         AudioSource.volume = PlayerPrefsManager.GetMasterEffectsVolume();
         BlockUserControlPanel.SetActive(true);
+    }
+
+    public enum Clip
+    {
+        TutorialClip,
+        DemoClip,
+        RoundSuccess,
+        RoundFailure
     }
 
     #region Animation Functions
@@ -47,7 +55,7 @@ public class GameBase : MonoBehaviour
         MoviePlayer.SetActive(true);
         MoviePlayer.GetComponent<Image>().material = Tutorial;
         var tutorialClip = (MovieTexture)MoviePlayer.GetComponent<Image>().mainTexture;
-        AudioSource.clip = AudioClips[0];
+        AudioSource.clip = AudioClips[(int)Clip.TutorialClip];
         tutorialClip.Play();
         AudioSource.Play();
         Invoke("TellGameEngineTutorialIsOver", tutorialClip.duration);
@@ -65,7 +73,7 @@ public class GameBase : MonoBehaviour
         MoviePlayer.SetActive(true);
         MoviePlayer.GetComponent<Image>().material = Demo;
         var demoClip = (MovieTexture)MoviePlayer.GetComponent<Image>().mainTexture;
-        AudioSource.clip = AudioClips[1];
+        AudioSource.clip = AudioClips[(int)Clip.DemoClip];
         demoClip.Play();
         AudioSource.Play();
         Invoke("TellGameEngineDemoIsOver", demoClip.duration);
@@ -77,24 +85,39 @@ public class GameBase : MonoBehaviour
         GameEngine.DemoIsOver();
     }
 
-    public void NotifyPlayer()
+    public void NotifyPlayer(bool answer)
     {
         BlockUserControlPanel.SetActive(true);
-        if (_success)
+        ShowCorrectNumber();
+
+        if (answer)
         {
-            //Also updates the progress bar.
-            GameAnimator.Play("success");
+            AudioSource.clip = AudioClips[(int)Clip.RoundSuccess];
+            AudioSource.Play();
+            Invoke("UpdateProgressBar", AudioSource.clip.length);
         }
         else
         {
-            GameAnimator.Play("failure");
+            AudioSource.clip = AudioClips[(int)Clip.RoundFailure];
+            AudioSource.Play();
+            Invoke("TellGameEnginePlayerHasBeenNotified", AudioSource.clip.length);
         }
+    }
+
+    public void UpdateProgressBar ()
+    {
+        ProgressBar.UpdateProgressBar();
+    }
+
+    public virtual void ShowCorrectNumber ()
+    {
+        //Always Override.
     }
 
     //Called at the end of both the success and failure notification animations.
     public void TellGameEnginePlayerHasBeenNotified()
     {
-        GameEngine.WasQuestionAnsweredCorrectly(_success);
+        GameEngine.PlayerHasBeenNotified();
     }
 
     //Called by the GameEngine if the final round has been completed.
@@ -121,23 +144,25 @@ public class GameBase : MonoBehaviour
     //Added as a listener to the button during start round.
     public void Correct()
     {
-        _success = true;
-        NotifyPlayer();
+        TellGameEnginePlayerHasSelectedAnAnswer(true);
     }
 
     //Added as a listener to the button during start round.
     public void InCorrect()
     {
-        _success = false;
-        NotifyPlayer();
+        TellGameEnginePlayerHasSelectedAnAnswer(false);
+    }
+
+    public void TellGameEnginePlayerHasSelectedAnAnswer (bool answer)
+    {
+        GameEngine.PlayerHasSelectedAnAnswer(answer);
     }
 
     //Used to prevent the user from doing anything while an animation is playing.
-    private IEnumerator ToggleUserBlockPanel(float delay)
+    private IEnumerator TurnOffBlockPanel (float delay)
     {
         yield return new WaitForSeconds(delay);
-        var toggle = BlockUserControlPanel.activeSelf;
-        BlockUserControlPanel.SetActive(!toggle);
+        BlockUserControlPanel.SetActive(false);
     }
 
     //Called by the options controller if there is a change in the sound effects volume.
