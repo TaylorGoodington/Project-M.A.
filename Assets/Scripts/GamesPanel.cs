@@ -24,18 +24,21 @@ public class GamesPanel : MonoBehaviour
         game1Button.image.sprite = Resources.Load<Sprite>("Game Icons/" + game1Id);
         game1Button.transform.GetChild(0).GetComponent<Text>().text = gamesNames[game1Id];
         game1Button.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game1Progress.ToString();
+        game1Button.onClick.RemoveAllListeners();
         game1Button.onClick.AddListener(() => LoadLevel(game1Id.ToString()));
 
         var game2Id = game1Id + 1;
         game2Button.image.sprite = Resources.Load<Sprite>("Game Icons/" + game2Id);
         game2Button.transform.GetChild(0).GetComponent<Text>().text = gamesNames[game2Id];
         game2Button.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game2Progress.ToString();
+        game2Button.onClick.RemoveAllListeners();
         game2Button.onClick.AddListener(() => LoadLevel(game2Id.ToString()));
 
         var game3Id = game2Id + 1;
         game3Button.image.sprite = Resources.Load<Sprite>("Game Icons/" + game3Id);
         game3Button.transform.GetChild(0).GetComponent<Text>().text = gamesNames[game3Id];
         game3Button.transform.GetChild(1).GetComponent<Text>().text = GameControl.Game3Progress.ToString();
+        game3Button.onClick.RemoveAllListeners();
         game3Button.onClick.AddListener(() => LoadLevel(game3Id.ToString()));
     }
 

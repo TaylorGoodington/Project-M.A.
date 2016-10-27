@@ -2,6 +2,7 @@
 using AzureServicesForUnity;
 using AzureServicesForUnity.Helpers;
 using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 
 public class GameControl : MonoBehaviour
 {
@@ -59,5 +60,33 @@ public class GameControl : MonoBehaviour
     public void LogOut()
     {
         GameEngine.LogOut();
+    }
+
+    public static void UploadStudentInformation (double timePlayed, int levelProgress = 0)
+    {
+        var name = string.Format("\"{0}\"", StudentLoginName);
+        var password = string.Format("\"{0}\"", StudentPassword);
+        var teacherId = string.Format("\"{0}\"", CurrentTeacherId);
+        var jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherId + "}";
+        var currentGame = GameEngine.CurrentGame;
+
+        if (levelProgress == 0)
+        {
+            //only updating time played
+            jsonData += ""; 
+        }
+        else
+        {
+            //update it all
+            jsonData += "";
+        }
+
+        EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("UploadInformation", HttpMethod.Post, jsonData, response =>
+        {
+            if (response.Status != CallBackResult.Success)
+            {
+                Debug.Log(response.Exception.Message);
+            }
+        });
     }
 }

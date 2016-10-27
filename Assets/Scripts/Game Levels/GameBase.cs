@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(AudioSource))]
@@ -15,6 +16,8 @@ public class GameBase : MonoBehaviour
     public Material Tutorial;
     public Material Demo;
     public ProgressBar ProgressBar;
+    public GameObject VictoryObject;
+    public GameObject DefeatObject;
 
     public virtual void Start()
     {
@@ -41,6 +44,12 @@ public class GameBase : MonoBehaviour
     public void TranisitionOut()
     {
         GameAnimator.Play("transitionOut");
+    }
+
+    //called at the end of transition out.
+    public void HeadBackToLevelScreen()
+    {
+        SceneManager.LoadScene("Level" + GameControl.StudentLevelProgress);
     }
 
     //Called at the end of the transitionIn animation.
@@ -121,16 +130,24 @@ public class GameBase : MonoBehaviour
     }
 
     //Called by the GameEngine if the final round has been completed.
-    public void GameOver(bool didPlayerWin)
+    public void GameOver(bool isGameCleared)
     {
-        if (didPlayerWin)
+        TurnOffButtons();
+
+        if (isGameCleared)
         {
-            GameAnimator.Play("victory");
+            VictoryObject.SetActive(true);
         }
         else
         {
-            GameAnimator.Play("defeat");
+            DefeatObject.SetActive(true);
         }
+    }
+
+    //Overrided by the inherited class.
+    public virtual void TurnOffButtons ()
+    {
+        //Always Override.
     }
 
     //Called by the animator when needed.

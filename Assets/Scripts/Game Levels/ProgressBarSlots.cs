@@ -1,14 +1,9 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Animator))]
 public class ProgressBarSlots : MonoBehaviour
 {
     private Animator animator;
-    void Start()
-    {
-        //animator = GetComponent<Animator>();
-
-        //animator.Play("Enable");
-    }
 
     public void TellGameEnginePlayerHasBeenNotified()
     {

@@ -128,13 +128,18 @@ public class Game11 : GameBase
 
     public override void ShowCorrectNumber()
     {
-        foreach(var slot in _numberSlots)
-        {
-            slot.SetActive(false);
-        }
+        TurnOffButtons();
 
         _numberSlots[correctSlot].SetActive(true);
         var correctImage = _numberSlots[correctSlot].GetComponent<Image>();
         correctImage.sprite = Resources.Load<Sprite>(resourcePath + "highlighted" + correctNumber);
+    }
+
+    public override void TurnOffButtons()
+    {
+        foreach (var slot in _numberSlots)
+        {
+            slot.SetActive(false);
+        }
     }
 }

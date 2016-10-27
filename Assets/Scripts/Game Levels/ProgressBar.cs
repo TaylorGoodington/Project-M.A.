@@ -17,6 +17,6 @@ public class ProgressBar : MonoBehaviour
 
     public void UpdateProgressBar ()
     {
-        barSlots[GameEngine.RoundsSucceeded].SetActive(true);
+        barSlots[GameEngine.RoundsSucceeded - 1].SetActive(true);
     }
 }

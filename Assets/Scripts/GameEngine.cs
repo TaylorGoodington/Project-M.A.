@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
+using System;
 
 public class GameEngine : MonoBehaviour
 {
@@ -13,7 +14,11 @@ public class GameEngine : MonoBehaviour
     public static string CurrentGame { get; set; }
     public static int CurrentStage { get; set; }
     public static bool DidPlayerPassCurrentRound { get; set; }
+    public static bool IsGameCleared { get; set; }
+    public static double TimePlayed { get; set; }
     public static GameObject Game { get; private set; }
+
+    private static DateTime timeStart;
 
     void Start ()
     {
@@ -31,6 +36,8 @@ public class GameEngine : MonoBehaviour
         CurrentRound = 0;
         RoundsFailed = 0;
         CurrentGame = SceneManager.GetActiveScene().name;
+        IsGameCleared = false;
+        timeStart = DateTime.Now;
 
         //TODO Adjust when the total number of categories is set.
         #region Current Stage and Max Rounds
@@ -144,20 +151,57 @@ public class GameEngine : MonoBehaviour
     public static void EndOfRound ()
     {
         Debug.Log("Current Round: " + CurrentRound + "  Max Rounds: " + MaxRounds);
-        if (CurrentRound != MaxRounds)
+        if (RoundsSucceeded == MaxRounds - NumberOfAcceptableRoundsToFail)
+        {
+            CallUpdloadInformation();
+            IsGameCleared = true;
+            TimePlayed = (timeStart - DateTime.Now).TotalSeconds;
+            Game.SendMessage("GameOver", IsGameCleared);
+        }
+        else if (CurrentRound != MaxRounds)
         {
             AdvanceToNextRound();
         }
         else
         {
-            if ((RoundsFailed <= NumberOfAcceptableRoundsToFail) || (RoundsSucceeded == MaxRounds - NumberOfAcceptableRoundsToFail))
+            CallUpdloadInformation();
+
+            if (RoundsFailed <= NumberOfAcceptableRoundsToFail)
             {
-                Game.SendMessage("GameOver", true);
+                IsGameCleared = true;
+                Game.SendMessage("GameOver", IsGameCleared);
             }
             else
             {
-                Game.SendMessage("GameOver", false);
+                IsGameCleared = false;
+                Game.SendMessage("GameOver", IsGameCleared);
             }
+        }
+    }
+
+    public static void CallUpdloadInformation ()
+    {
+        if (IsGameCleared)
+        {
+            GameControl.UploadStudentInformation(TimePlayed, CurrentStage++);
+
+            if (CurrentGame == "1")
+            {
+                GameControl.Game1Progress++;
+            }
+            else if (CurrentGame == "2")
+            {
+                GameControl.Game2Progress++;
+            }
+            else if (CurrentGame == "3")
+            {
+                GameControl.Game3Progress++;
+            }
+
+        }
+        else
+        {
+            GameControl.UploadStudentInformation(TimePlayed);
         }
     }
 }
