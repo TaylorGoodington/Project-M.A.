@@ -67,21 +67,31 @@ public class GameControl : MonoBehaviour
         var name = string.Format("\"{0}\"", StudentLoginName);
         var password = string.Format("\"{0}\"", StudentPassword);
         var teacherId = string.Format("\"{0}\"", CurrentTeacherId);
-        var jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherId + "}";
+        var jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherId + " , ";
         var currentGame = GameEngine.CurrentGame;
 
         if (levelProgress == 0)
         {
             //only updating time played
-            jsonData += ""; 
+            jsonData += "}"; 
         }
         else
         {
             //update it all
-            jsonData += "";
+            jsonData += "}";
         }
 
-        EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("UploadInformation", HttpMethod.Post, jsonData, response =>
+        //Stage is cleared...record the timestamp.
+        if (1==2)
+        {
+            jsonData += "}";
+        }
+        else
+        {
+            jsonData += "1/1/2000 12:00:00 AM";
+        }
+
+        EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("UdateInformation", HttpMethod.Post, jsonData, response =>
         {
             if (response.Status != CallBackResult.Success)
             {

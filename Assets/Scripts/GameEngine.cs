@@ -15,7 +15,7 @@ public class GameEngine : MonoBehaviour
     public static int CurrentStage { get; set; }
     public static bool DidPlayerPassCurrentRound { get; set; }
     public static bool IsGameCleared { get; set; }
-    public static double TimePlayed { get; set; }
+    public static float TimePlayed { get; set; }
     public static GameObject Game { get; private set; }
 
     private static DateTime timeStart;
@@ -155,7 +155,7 @@ public class GameEngine : MonoBehaviour
         {
             CallUpdloadInformation();
             IsGameCleared = true;
-            TimePlayed = (timeStart - DateTime.Now).TotalSeconds;
+            TimePlayed = (float)(timeStart - DateTime.Now).TotalSeconds;
             Game.SendMessage("GameOver", IsGameCleared);
         }
         else if (CurrentRound != MaxRounds)
