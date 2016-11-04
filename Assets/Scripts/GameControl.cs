@@ -62,33 +62,26 @@ public class GameControl : MonoBehaviour
         GameEngine.LogOut();
     }
 
-    public static void UploadStudentInformation (double timePlayed, int levelProgress = 0)
+    public static void UploadStudentInformation (double timePlayed, int currentStage = 0)
     {
         var name = string.Format("\"{0}\"", StudentLoginName);
         var password = string.Format("\"{0}\"", StudentPassword);
         var teacherId = string.Format("\"{0}\"", CurrentTeacherId);
-        var jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherId + " , ";
-        var currentGame = GameEngine.CurrentGame;
+        var game = string.Format("\"{0}\"", GameEngine.CurrentGame);
+        var jsonData = "{\"loginName\":" + name + " , \"loginPassword\":" + password + " , \"teacherID\":" + teacherId + " , \"game\":" + game + " , ";
 
-        if (levelProgress == 0)
+        if (currentStage == 0)
         {
-            //only updating time played
-            jsonData += "}"; 
+            var stage = string.Format("\"{0}\"", GameEngine.CurrentStage);
+            var time = string.Format("\"{0}\"", timePlayed);
+            jsonData += "\"stage\":" + stage + " , \"timePlayed\":" + time + " , \"dateCleared\":\"1/1/2000 12:00:00 AM\"}";
         }
         else
         {
-            //update it all
-            jsonData += "}";
-        }
-
-        //Stage is cleared...record the timestamp.
-        if (1==2)
-        {
-            jsonData += "}";
-        }
-        else
-        {
-            jsonData += "1/1/2000 12:00:00 AM";
+            var stage = string.Format("\"{0}\"", currentStage);
+            var time = string.Format("\"{0}\"", timePlayed);
+            var dateCleared = string.Format("\"{0}\"", System.DateTime.Now);
+            jsonData += "\"stage\":" + stage + " , \"timePlayed\":" + time + " , \"dateCleared\":" + dateCleared + "}";
         }
 
         EasyAPIs.Instance.CallAPI<CustomAPIReturnObject>("UdateInformation", HttpMethod.Post, jsonData, response =>

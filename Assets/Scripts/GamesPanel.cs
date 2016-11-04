@@ -20,6 +20,8 @@ public class GamesPanel : MonoBehaviour
     {
         var gameLevel = GameControl.StudentLevelProgress;
 
+        //check if any games need to have an animation play to display their new stage count.
+
         var game1Id = gameLevel * 10 + 1;
         game1Button.image.sprite = Resources.Load<Sprite>("Game Icons/" + game1Id);
         game1Button.transform.GetChild(0).GetComponent<Text>().text = gamesNames[game1Id];

@@ -11,6 +11,7 @@ public class GameEndingNotifiers : MonoBehaviour
         animator = GetComponent<Animator>();
 
         animator.Play("enable");
+        GameEngine.CallUpdloadInformation();
 	}
 
     public void CallTransitionOut()

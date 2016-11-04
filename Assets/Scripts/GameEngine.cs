@@ -39,15 +39,15 @@ public class GameEngine : MonoBehaviour
         IsGameCleared = false;
         timeStart = DateTime.Now;
 
-        //TODO Adjust when the total number of categories is set.
+        //TODO Adjust when the total number of games is set.
         #region Current Stage and Max Rounds
-        var category = int.Parse(CurrentGame.Substring(CurrentGame.Length - 1, 1));
-        if (category == 1)
+        var game = int.Parse(CurrentGame.Substring(CurrentGame.Length - 1, 1));
+        if (game == 1)
         {
             CurrentStage = GameControl.Game1Progress;
             SetRoundInformation();
         }
-        else if (category == 2)
+        else if (game == 2)
         {
             CurrentStage = GameControl.Game2Progress;
             SetRoundInformation();
@@ -153,7 +153,6 @@ public class GameEngine : MonoBehaviour
         Debug.Log("Current Round: " + CurrentRound + "  Max Rounds: " + MaxRounds);
         if (RoundsSucceeded == MaxRounds - NumberOfAcceptableRoundsToFail)
         {
-            CallUpdloadInformation();
             IsGameCleared = true;
             TimePlayed = (float)(timeStart - DateTime.Now).TotalSeconds;
             Game.SendMessage("GameOver", IsGameCleared);
@@ -164,8 +163,6 @@ public class GameEngine : MonoBehaviour
         }
         else
         {
-            CallUpdloadInformation();
-
             if (RoundsFailed <= NumberOfAcceptableRoundsToFail)
             {
                 IsGameCleared = true;
@@ -184,7 +181,6 @@ public class GameEngine : MonoBehaviour
         if (IsGameCleared)
         {
             GameControl.UploadStudentInformation(TimePlayed, CurrentStage++);
-
             if (CurrentGame == "1")
             {
                 GameControl.Game1Progress++;
@@ -197,7 +193,6 @@ public class GameEngine : MonoBehaviour
             {
                 GameControl.Game3Progress++;
             }
-
         }
         else
         {
